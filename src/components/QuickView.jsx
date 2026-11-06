@@ -1,0 +1,7 @@
+import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n);
+export default function QuickView({product,onClose,onOrder}){
+ const [option,setOption]=useState('');useEffect(()=>{setOption(product?.sizes?.[0]||'');},[product]);if(!product)return null;
+ return <div className="quick-overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><section className="quick-modal" role="dialog" aria-modal="true" aria-label={product.name}><button className="quick-close" onClick={onClose} aria-label="Close"><X/></button><img src={product.image} alt={product.name}/><div className="quick-details"><span className="eyebrow">{product.category.toUpperCase()}</span><h2>{product.name}</h2><strong>{money(product.price)}</strong>{product.oldPrice&&<del>{money(product.oldPrice)}</del>}<p>{product.description}</p>{product.sizes?.length>0&&<><span className="eyebrow">SELECT SIZE / OPTION</span><div className="size-options">{product.sizes.map(s=><button key={s} className={option===s?'selected':''} onClick={()=>setOption(s)}>{s}</button>)}</div></>}<button className="checkout-button" onClick={()=>onOrder({...product,selectedOption:option})}>Enquire on WhatsApp</button><small className="product-order-note">We'll confirm availability, delivery and final order details with you.</small></div></section></div>;
+}

@@ -1,0 +1,10 @@
+{
+  "name": "SHELBY — Everyday, reconsidered",
+  "short_name": "SHELBY",
+  "description": "Considered clothing, sneakers and everyday essentials.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f6f2",
+  "theme_color": "#f7f6f2",
+  "icons": []
+}

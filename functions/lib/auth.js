@@ -1,0 +1,7 @@
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+export const b64url = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+const fromB64url = value => Uint8Array.from(atob((value.replace(/-/g,'+').replace(/_/g,'/')+'===').slice(0,Math.ceil(value.length/4)*4)),c=>c.charCodeAt(0));
+export async function sign(value,secret){const key=await crypto.subtle.importKey('raw',encoder.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return new Uint8Array(await crypto.subtle.sign('HMAC',key,encoder.encode(value)));}
+function cookieValue(header,name){const item=(header||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(`${name}=`));return item?item.slice(name.length+1):'';}
+export async function validSession(request,secret){const token=cookieValue(request.headers.get('Cookie'),'shelby_admin');if(!token||!secret)return false;const [payload,signature,...rest]=token.split('.');if(!payload||!signature||rest.length)return false;try{const expected=await sign(payload,secret),supplied=fromB64url(signature);if(expected.length!==supplied.length)return false;let diff=0;for(let i=0;i<expected.length;i++)diff|=expected[i]^supplied[i];if(diff!==0)return false;const claims=JSON.parse(decoder.decode(fromB64url(payload)));return claims.sub==='admin'&&Number(claims.exp)>Math.floor(Date.now()/1000);}catch{return false;}}
